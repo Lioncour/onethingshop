@@ -1,9 +1,9 @@
 const items = [
     {
         id: 1,
-        name: "Vintage Leica M3",
-        price: 1299,
-        description: "1954 Leica M3 in excellent condition. Original leather case included. Recently serviced.",
+        name: "Test Item",
+        price: 1,  // Just $1 for testing
+        description: "Test item for verifying PayPal integration",
         image: "images/items/item1/main.jpg",
         sold: false,
         additionalImages: [
