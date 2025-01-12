@@ -231,50 +231,17 @@ function openModal(item) {
             try {
                 // Create and render new PayPal buttons
                 const buttons = paypal.Buttons({
-                    style: {
-                        layout: 'vertical',
-                        color: 'black',
-                        shape: 'rect'
-                    },
                     createOrder: (data, actions) => {
-                        console.log('Creating PayPal order');
                         return actions.order.create({
                             purchase_units: [{
                                 amount: {
-                                    currency_code: "USD",
-                                    value: (item.price + 15).toString(),
-                                    breakdown: {
-                                        item_total: {
-                                            currency_code: "USD",
-                                            value: item.price.toString()
-                                        },
-                                        shipping: {
-                                            currency_code: "USD",
-                                            value: "15.00"
-                                        }
-                                    }
-                                },
-                                shipping: {
-                                    type: "SHIPPING",
-                                    options: [
-                                        {
-                                            id: "INTERNATIONAL",
-                                            label: "International Shipping",
-                                            selected: true,
-                                            amount: {
-                                                value: "15.00",
-                                                currency_code: "USD"
-                                            }
-                                        }
-                                    ]
+                                    value: (item.price + 15).toString()
                                 }
                             }]
                         });
                     },
                     onApprove: (data, actions) => {
-                        console.log('Payment approved');
                         return actions.order.capture().then((details) => {
-                            console.log('Payment completed');
                             item.sold = true;
                             const nextItem = items.find(i => !i.sold && i.id > 1);
                             if (nextItem) {
@@ -288,12 +255,7 @@ function openModal(item) {
                 });
 
                 console.log('Rendering PayPal buttons');
-                buttons.render('#modal-paypal-container')
-                    .catch(err => {
-                        console.error('PayPal render error:', err);
-                        buyButton.style.display = 'block';
-                        paypalContainer.classList.add('hidden');
-                    });
+                buttons.render('#modal-paypal-container');
             } catch (error) {
                 console.error('Error setting up PayPal:', error);
                 buyButton.style.display = 'block';
