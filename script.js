@@ -231,9 +231,16 @@ function openModal(item) {
             try {
                 // Create and render new PayPal buttons
                 const buttons = paypal.Buttons({
+                    style: {
+                        layout: 'vertical',
+                        color: 'gold',  // Use standard PayPal button style
+                        shape: 'rect',
+                        label: 'paypal'
+                    },
                     createOrder: (data, actions) => {
                         return actions.order.create({
                             purchase_units: [{
+                                description: item.name,
                                 amount: {
                                     value: (item.price + 15).toString()
                                 }
