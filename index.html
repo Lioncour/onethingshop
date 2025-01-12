@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRUTAL UNIQUE SHOP</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>ONETHINGSHOP</h1>
+        <p class="manifesto">Trying to become a minimalist. Got some strange and unique items that are to funny to throw, so selling them here. Only ONE item will be able to purchase before unlocking the next one. Buy something cool :D</p>
+    </header>
+
+    <main class="grid-container">
+        <!-- Items will be dynamically inserted here -->
+    </main>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="modal-images">
+                <img id="modal-main-image" src="" alt="">
+                <div class="modal-thumbnails"></div>
+            </div>
+            <div class="modal-info">
+                <h2 id="modal-title"></h2>
+                <p id="modal-description"></p>
+                <p id="modal-price"></p>
+                <p class="shipping-notice">* Worldwide shipping: Flat rate $15 USD</p>
+                <button id="modal-buy-button" class="brutal-button">BUY NOW</button>
+                <div id="modal-paypal-container" class="hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD&debug=true&buyer-country=ALL&components=buttons,funding-eligibility"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
