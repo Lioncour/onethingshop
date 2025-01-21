@@ -23,12 +23,17 @@ h1 {
     text-align: left;
     letter-spacing: -2px;
     text-transform: uppercase;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 300;
 }
 
 .manifesto {
     text-align: left;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin-top: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    line-height: 1.4;
 }
 
 .grid-container {
@@ -43,6 +48,9 @@ h1 {
     padding: 8px;
     position: relative;
     transition: transform 0.3s;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .item:hover {
@@ -51,7 +59,7 @@ h1 {
 
 .item img {
     width: 100%;
-    height: 150px;
+    height: calc(100% - 60px);
     object-fit: cover;
 }
 
@@ -74,11 +82,15 @@ h1 {
 .item-info {
     margin-top: 8px;
     font-size: 0.85rem;
+    flex-shrink: 0;
 }
 
 .item-info h2 {
     font-size: 1rem;
     margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Add blur to text in blurred items */
@@ -113,14 +125,14 @@ h1 {
 .modal-content {
     position: relative;
     background-color: #000;
-    margin: 5% auto;
-    padding: 20px;
+    margin: 3% auto;
+    padding: 30px;
     border: 4px solid #fff;
-    width: 90%;
-    max-width: 1000px;
+    width: 95%;
+    max-width: 1200px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 30px;
 }
 
 .close-button {
@@ -139,7 +151,7 @@ h1 {
 .modal-images {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
 }
 
 #modal-main-image {
@@ -151,21 +163,30 @@ h1 {
 
 .modal-thumbnails {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     overflow-x: auto;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 .modal-thumbnail {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
     cursor: pointer;
     border: 2px solid #fff;
     transition: transform 0.2s;
+    flex-shrink: 0;
 }
 
 .modal-thumbnail:hover {
     transform: scale(1.1);
+}
+
+/* Hide scrollbar but keep functionality */
+.modal-thumbnails::-webkit-scrollbar {
+    height: 0;
+    width: 0;
 }
 
 .modal-info {
@@ -231,4 +252,14 @@ h1 {
     font-size: 1rem;
     font-weight: bold;
     z-index: 1;
+}
+
+.modal-info a {
+    color: #fff;
+    text-decoration: underline;
+    transition: opacity 0.3s;
+}
+
+.modal-info a:hover {
+    opacity: 0.8;
 } 

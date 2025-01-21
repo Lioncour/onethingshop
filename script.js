@@ -3,7 +3,7 @@ const items = [
         id: 1,
         name: "Hip flask",
         price: 89,
-        description: "Pocket lark / Hip flask in excellent condition. Made this for my brother, but he dont drink. So now its up for sale A nice video of how i made it here: https://studio.youtube.com/video/geAr7Pv-jG8/edit Original leather case included. Holds just enough liquor.",
+        description: "Pocket lark / Hip flask in excellent condition. Made this for my brother, but he dont drink. So now its up for sale A nice video of how i made it here: https://youtu.be/geAr7Pv-jG8?si=FUJxhsvOVat-fGbg Original leather case included. Holds just enough liquor.",
         image: "images/items/item1/main.jpg",
         sold: false,
         additionalImages: [
@@ -147,7 +147,6 @@ function renderItems() {
             <img src="${item.image}" alt="${item.name}" onerror="this.src='images/placeholder.jpg'">
             <div class="item-info">
                 <h2>${item.name}</h2>
-                <p>${item.description}</p>
                 <p class="price">$${item.price}</p>
             </div>
         `;
@@ -191,7 +190,14 @@ function openModal(item) {
     const paypalContainer = document.getElementById('modal-paypal-container');
 
     modalTitle.textContent = item.name;
-    modalDescription.textContent = item.description;
+    
+    // Convert URLs in description to clickable links
+    const description = item.description.replace(
+        /(https?:\/\/[^\s]+)/g, 
+        '<a href="$1" target="_blank" style="color: #fff; text-decoration: underline;">$1</a>'
+    );
+    modalDescription.innerHTML = description;  // Use innerHTML instead of textContent
+    
     modalPrice.textContent = `$${item.price} + $15 Shipping`;
     modalMainImage.src = item.image;
 
