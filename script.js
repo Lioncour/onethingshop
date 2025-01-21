@@ -15,16 +15,12 @@ const items = [
     },
     {
         id: 2,
-        name: "Model heads",
-        price: 23,
-        description: "When i went to art school i had an awesome visiting teacher, i made a head sculpt of him, and then i cast a copy  in epoxy. They original is a bit busted up, but i have sealed all the damage with CA-glue",
+        name: "???",
+        price: "???",
+        description: "This item will be revealed when the first item is sold",
         image: "images/items/item2/main.jpg",
         sold: false,
-        additionalImages: [
-            "images/items/item2/main.jpg",
-            "images/items/item2/detail1.jpg",
-            "images/items/item2/detail2.jpg"
-        ]
+        additionalImages: []
     },
     {
         id: 3,
@@ -102,8 +98,8 @@ function renderItems() {
     // Filter items that have images
     const itemsWithImages = items.filter(item => {
         try {
-            // Only include items 1 through 6
-            return item.id <= 6 && item.image && item.additionalImages && item.additionalImages.length > 0;
+            // Only include items 1 through 6, and always include item if it has a main image
+            return item.id <= 6 && item.image;  // Removed additionalImages check
         } catch (e) {
             console.error('Error checking images for item:', item.id);
             return false;
@@ -203,13 +199,15 @@ function openModal(item) {
 
     // Clear and populate thumbnails
     modalThumbnails.innerHTML = '';
-    item.additionalImages.forEach(imgSrc => {
-        const thumb = document.createElement('img');
-        thumb.src = imgSrc;
-        thumb.className = 'modal-thumbnail';
-        thumb.onclick = () => modalMainImage.src = imgSrc;
-        modalThumbnails.appendChild(thumb);
-    });
+    if (item.additionalImages && item.additionalImages.length > 0) {
+        item.additionalImages.forEach(imgSrc => {
+            const thumb = document.createElement('img');
+            thumb.src = imgSrc;
+            thumb.className = 'modal-thumbnail';
+            thumb.onclick = () => modalMainImage.src = imgSrc;
+            modalThumbnails.appendChild(thumb);
+        });
+    }
 
     // Show/hide buy button based on item status
     if (item.sold) {
