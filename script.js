@@ -1,9 +1,9 @@
 const items = [
     {
         id: 1,
-        name: "Test Item",
-        price: 1,  // Just $1 for testing
-        description: "Test item for verifying PayPal integration",
+        name: "Hip flask",
+        price: 89,
+        description: "Pocket lark / Hip flask in excellent condition. Made this for my brother, but he dont drink. So now its up for sale A nice video of how i made it here: https://studio.youtube.com/video/geAr7Pv-jG8/edit Original leather case included. Holds just enough liquor.",
         image: "images/items/item1/main.jpg",
         sold: false,
         additionalImages: [
@@ -15,9 +15,9 @@ const items = [
     },
     {
         id: 2,
-        name: "Item Two",
-        price: 199,
-        description: "Description for item two",
+        name: "Model heads",
+        price: 23,
+        description: "When i went to art school i had an awesome visiting teacher, i made a head sculpt of him, and then i cast a copy  in epoxy. They original is a bit busted up, but i have sealed all the damage with CA-glue",
         image: "images/items/item2/main.jpg",
         sold: false,
         additionalImages: [
@@ -28,9 +28,9 @@ const items = [
     },
     {
         id: 3,
-        name: "Item Three",
-        price: 399,
-        description: "Description for item three",
+        name: "Good luck on trip charm",
+        price: 37,
+        description: "I made this when i went on my first winter 'survival tour' It brings good luck and especially help you not forget stuff, no use to me anymore. Front side is covered in epoxy, has a lanyard and is really cool.",
         image: "images/items/item3/main.jpg",
         sold: false,
         additionalImages: [
@@ -41,9 +41,9 @@ const items = [
     },
     {
         id: 4,
-        name: "Item Four",
-        price: 299,
-        description: "Description for item four",
+        name: "Sheath",
+        price: 41,
+        description: "I made this sheath for my scissor or shears, but i dont use it anymore.Made in heavy cotton, a 3d printed loop with waxed thread. The front and back is in lazer cut wood panels.",
         image: "images/items/item4/main.jpg",
         sold: false,
         additionalImages: [
@@ -56,9 +56,9 @@ const items = [
     },
     {
         id: 5,
-        name: "Item Five",
-        price: 299,
-        description: "Description for item five",
+        name: "My initials in brass",
+        price: 129,
+        description: "Handmade by me after i watched an awesome youtube video from Jimmy Diresta. a lot of solder, sweat, love and brass went into this item. Could use a good polish. Great for a person that has the initials J.A.E",
         image: "images/items/item5/main.jpg",
         sold: false,
         additionalImages: [
@@ -69,9 +69,9 @@ const items = [
     },
     {
         id: 6,
-        name: "Item Six",
-        price: 299,
-        description: "Description for item six",
+        name: "Box",
+        price: 99,
+        description: "A very nice box, that opens on the short side with piano hinges.Holes for mounting on the inside Was used to store various gameboys and games. Made by violet valchromat, plywood and some brass. A bit heavy, but very sturdy. A few blemishes and have a small wooden piece on the bottom side to ensure that the main door do not sag.",
         image: "images/items/item6/main.jpg",
         sold: false,
         additionalImages: [
