@@ -75,6 +75,33 @@ const items = [
             "images/items/item6/detail1.jpg",
             "images/items/item6/detail2.jpg"
         ]
+    },
+    {
+        id: 7,
+        name: "???",
+        price: "???",
+        description: "This item will be revealed when previous items are sold",
+        image: "images/items/item7/main.jpg",
+        sold: false,
+        additionalImages: []
+    },
+    {
+        id: 8,
+        name: "???",
+        price: "???",
+        description: "This item will be revealed when previous items are sold",
+        image: "images/items/item8/main.jpg",
+        sold: false,
+        additionalImages: []
+    },
+    {
+        id: 9,
+        name: "???",
+        price: "???",
+        description: "This item will be revealed when previous items are sold",
+        image: "images/items/item9/main.jpg",
+        sold: false,
+        additionalImages: []
     }
 ];
 
@@ -98,8 +125,8 @@ function renderItems() {
     // Filter items that have images
     const itemsWithImages = items.filter(item => {
         try {
-            // Only include items 1 through 6, and always include item if it has a main image
-            return item.id <= 6 && item.image;  // Removed additionalImages check
+            // Change from 6 to 9 to include new items
+            return item.id <= 9 && item.image;
         } catch (e) {
             console.error('Error checking images for item:', item.id);
             return false;
