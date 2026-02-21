@@ -1,3 +1,10 @@
+const PLACEHOLDER = "data:image/svg+xml," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">' +
+    '<rect width="400" height="400" fill="#111"/>' +
+    '<text x="200" y="220" text-anchor="middle" font-size="120" fill="#333" font-family="monospace">?</text>' +
+    '</svg>'
+);
+
 const items = [
     {
         id: 1,
@@ -18,8 +25,9 @@ const items = [
         name: "???",
         price: "???",
         description: "This item will be revealed when the first item is sold",
-        image: "images/items/item2/main.jpg",
+        image: PLACEHOLDER,
         sold: false,
+        hidden: true,
         additionalImages: []
     },
     {
@@ -81,8 +89,9 @@ const items = [
         name: "???",
         price: "???",
         description: "This item will be revealed when previous items are sold",
-        image: "images/items/item7/main.jpg",
+        image: PLACEHOLDER,
         sold: false,
+        hidden: true,
         additionalImages: []
     },
     {
@@ -90,8 +99,9 @@ const items = [
         name: "???",
         price: "???",
         description: "This item will be revealed when previous items are sold",
-        image: "images/items/item8/main.jpg",
+        image: PLACEHOLDER,
         sold: false,
+        hidden: true,
         additionalImages: []
     },
     {
@@ -99,8 +109,9 @@ const items = [
         name: "???",
         price: "???",
         description: "This item will be revealed when previous items are sold",
-        image: "images/items/item9/main.jpg",
+        image: PLACEHOLDER,
         sold: false,
+        hidden: true,
         additionalImages: []
     }
 ];
@@ -153,21 +164,23 @@ function renderItems() {
     
     sortedItems.forEach((item) => {
         const itemElement = document.createElement('div');
-        const isCurrentItem = item.id === 1;  // Check if this is item #1
+        const isCurrentItem = item.id === 1;
+        const isHidden = item.hidden && !item.sold;
         
-        itemElement.className = `item ${!item.sold && !isCurrentItem ? 'blurred' : ''} ${item.sold ? 'sold' : ''}`;
+        itemElement.className = `item ${isHidden ? 'blurred' : ''} ${!item.sold && !isCurrentItem && !isHidden ? 'blurred' : ''} ${item.sold ? 'sold' : ''}`;
         
         if (isCurrentItem || item.sold) {
             itemElement.style.cursor = 'pointer';
-            itemElement.addEventListener('click', () => {
-                console.log('Clicked item:', item.name);
-                openModal(item);
-            });
+            itemElement.addEventListener('click', () => openModal(item));
         }
+
+        const imgSrc = isHidden ? PLACEHOLDER : item.image;
 
         itemElement.innerHTML = `
             <div class="item-number">#${item.id}</div>
-            <img src="${item.image}" alt="${item.name}" onerror="this.src='images/placeholder.jpg'">
+            <div class="img-shield">
+                <div class="img-cover" style="background-image:url('${imgSrc}')"></div>
+            </div>
             <div class="item-info">
                 <h2>${item.name}</h2>
                 <p class="price">$${item.price}</p>
@@ -214,24 +227,22 @@ function openModal(item) {
 
     modalTitle.textContent = item.name;
     
-    // Convert URLs in description to clickable links
     const description = item.description.replace(
         /(https?:\/\/[^\s]+)/g, 
         '<a href="$1" target="_blank" style="color: #fff; text-decoration: underline;">$1</a>'
     );
-    modalDescription.innerHTML = description;  // Use innerHTML instead of textContent
+    modalDescription.innerHTML = description;
     
     modalPrice.textContent = `$${item.price} + $15 Shipping`;
-    modalMainImage.src = item.image;
+    modalMainImage.style.backgroundImage = `url('${item.image}')`;
 
-    // Clear and populate thumbnails
     modalThumbnails.innerHTML = '';
     if (item.additionalImages && item.additionalImages.length > 0) {
         item.additionalImages.forEach(imgSrc => {
-            const thumb = document.createElement('img');
-            thumb.src = imgSrc;
+            const thumb = document.createElement('div');
             thumb.className = 'modal-thumbnail';
-            thumb.onclick = () => modalMainImage.src = imgSrc;
+            thumb.style.backgroundImage = `url('${imgSrc}')`;
+            thumb.onclick = () => modalMainImage.style.backgroundImage = `url('${imgSrc}')`;
             modalThumbnails.appendChild(thumb);
         });
     }
@@ -321,6 +332,17 @@ window.onclick = function(event) {
     }
 }
 
-// Set the current item for sale (let's make the third item available)
-currentItemIndex = 2;  // This will make "Industrial Light Matrix" the current item for sale
+// Prevent right-click context menu on the whole page to protect images
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+});
+
+// Prevent drag on all images and image containers
+document.addEventListener('dragstart', function(e) {
+    if (e.target.tagName === 'IMG' || e.target.classList.contains('img-cover')) {
+        e.preventDefault();
+    }
+});
+
+currentItemIndex = 2;
 renderItems(); 

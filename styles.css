@@ -57,13 +57,35 @@ h1 {
     transform: scale(1.02);
 }
 
-.item img {
+.img-shield {
+    position: relative;
     width: 100%;
     height: calc(100% - 60px);
-    object-fit: cover;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
-.item.blurred img {
+.img-cover {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+.img-shield::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.item.blurred .img-cover {
     filter: blur(20px);
 }
 
@@ -154,11 +176,16 @@ h1 {
     gap: 20px;
 }
 
-#modal-main-image {
+.modal-main-shield {
     width: 100%;
     height: 400px;
-    object-fit: cover;
+    background-size: cover;
+    background-position: center;
     border: 2px solid #fff;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
 }
 
 .modal-thumbnails {
@@ -172,11 +199,14 @@ h1 {
 .modal-thumbnail {
     width: 100px;
     height: 100px;
-    object-fit: cover;
+    background-size: cover;
+    background-position: center;
     cursor: pointer;
     border: 2px solid #fff;
     transition: transform 0.2s;
     flex-shrink: 0;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .modal-thumbnail:hover {
@@ -262,4 +292,11 @@ h1 {
 
 .modal-info a:hover {
     opacity: 0.8;
+}
+
+img {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
 } 
