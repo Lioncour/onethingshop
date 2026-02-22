@@ -332,6 +332,13 @@ window.onclick = function(event) {
     }
 }
 
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.getElementById('modal').style.display = 'none';
+    }
+});
+
 // Prevent right-click context menu on the whole page to protect images
 document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
