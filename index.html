@@ -3,45 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BRUTAL UNIQUE SHOP</title>
+    <title>ONETHINGSHOP — Flokroll Projects</title>
+    <meta name="description" content="On the road to minimalism. One strange, unique item for sale at a time. Worldwide shipping.">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <div class="header-top">
-            <h1>ONETHINGSHOP</h1>
-            <a href="#about" class="about-link">ABOUT</a>
-        </div>
-        <p class="manifesto">On the road to minimalism. Getting rid of some strange and unique items. There is a catch: To see what's next for sale, the prior item needs to be sold.</p>
-    </header>
+    <section class="fp-hero">
+        <h1>
+            <span class="fp-dev">
+                <span class="fp-dev__ghost" aria-hidden="true">ONE</span>
+                <span class="fp-dev__real">ONE</span>
+            </span>
+            <span class="fp-highlight">THING</span>
+            SHOP
+        </h1>
+        <p class="fp-label">PROSJEKT 018 · ONETHINGSHOP · 2026</p>
+        <p class="fp-lead">On the road to minimalism. Getting rid of some strange and unique items. There is a catch: to see what’s next for sale, the prior item needs to be sold.</p>
+    </section>
 
-    <main class="grid-container">
+    <main id="shop" class="grid-container">
         <!-- Items will be dynamically inserted here -->
     </main>
 
-    <footer class="about-footer">a <a href="https://janandersekroll.no" target="_blank">flokroll</a> project</footer>
+    <footer id="about" class="fp-footer">
+        <p class="fp-footer-note">A <a href="https://janandersekroll.no" target="_blank" rel="noopener noreferrer">flokroll</a> project</p>
+    </footer>
 
     <div id="modal" class="modal">
         <div class="modal-content">
-            <span class="close-button">&times;</span>
+            <button type="button" class="close-button" aria-label="Close">&times;</button>
             <div class="modal-images">
-                <div id="modal-main-image" class="modal-main-shield"></div>
+                <div class="modal-main-wrap">
+                    <div id="modal-main-image" class="modal-main-shield"></div>
+                    <div id="modal-sticker" class="sale-sticker hidden" aria-hidden="true">
+                        <span class="sale-sticker__off">−50%</span>
+                        <span class="sale-sticker__label">Sale</span>
+                    </div>
+                </div>
                 <div class="modal-thumbnails"></div>
             </div>
             <div class="modal-info">
                 <h2 id="modal-title"></h2>
                 <p id="modal-description"></p>
-                <p id="modal-price"></p>
-                <p class="shipping-notice">* Worldwide shipping: Flat rate $15 USD</p>
-                <button id="modal-buy-button" class="brutal-button">BUY NOW</button>
+                <div id="modal-spec" class="fp-spec"></div>
+                <button id="modal-buy-button" class="fp-btn fp-btn--full" type="button"><span>Buy now</span></button>
+                <p id="paypal-error" class="fp-error hidden"></p>
                 <div id="modal-paypal-container" class="hidden"></div>
             </div>
         </div>
     </div>
 
-    <script src="https://www.paypal.com/sdk/js?client-id=AXpI0Ye7CNuooBZH3lw-02VlxnigorkpPA21vAAR2AzgSIE8Oq5RIUfLaVy2kYzuIqZAsWb2OdWp4Rc7&currency=USD&intent=capture"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AXpI0Ye7CNuooBZH3lw-02VlxnigorkpPA21vAAR2AzgSIE8Oq5RIUfLaVy2kYzuIqZAsWb2OdWp4Rc7&currency=USD&intent=capture&components=buttons"></script>
     <script src="script.js"></script>
 </body>
-</html> 
+</html>

@@ -1,15 +1,18 @@
 const PLACEHOLDER = "data:image/svg+xml," + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">' +
-    '<rect width="400" height="400" fill="#111"/>' +
-    '<text x="200" y="220" text-anchor="middle" font-size="120" fill="#333" font-family="monospace">?</text>' +
+    '<rect width="400" height="400" fill="#E0DAD1"/>' +
+    '<text x="200" y="220" text-anchor="middle" font-size="120" fill="#8A8378" font-family="monospace">?</text>' +
     '</svg>'
 );
 
 const items = [
     {
         id: 1,
+        number: 18,
         name: "Hip flask",
-        price: 89,
+        originalPrice: 89,
+        price: 44.5,
+        discount: 50,
         description: "Pocket lark / Hip flask in excellent condition. Made this for my brother, but he dont drink. So now its up for sale A nice video of how i made it here: https://youtu.be/geAr7Pv-jG8?si=FUJxhsvOVat-fGbg Original leather case included. Holds just enough liquor.",
         image: "images/items/item1/main.jpg",
         sold: false,
@@ -22,16 +25,18 @@ const items = [
     },
     {
         id: 2,
+        number: 19,
         name: "???",
         price: "???",
         description: "This item will be revealed when the first item is sold",
-        image: PLACEHOLDER,
+        image: "images/items/item2/main.jpg",
         sold: false,
         hidden: true,
         additionalImages: []
     },
     {
         id: 3,
+        number: 20,
         name: "Good luck on trip charm",
         price: 37,
         description: "I made this when i went on my first winter 'survival tour' It brings good luck and especially help you not forget stuff, no use to me anymore. Front side is covered in epoxy, has a lanyard and is really cool.",
@@ -45,6 +50,7 @@ const items = [
     },
     {
         id: 4,
+        number: 21,
         name: "Sheath",
         price: 41,
         description: "I made this sheath for my scissor or shears, but i dont use it anymore.Made in heavy cotton, a 3d printed loop with waxed thread. The front and back is in lazer cut wood panels.",
@@ -60,6 +66,7 @@ const items = [
     },
     {
         id: 5,
+        number: 22,
         name: "My initials in brass",
         price: 129,
         description: "Handmade by me after i watched an awesome youtube video from Jimmy Diresta. a lot of solder, sweat, love and brass went into this item. Could use a good polish. Great for a person that has the initials J.A.E",
@@ -73,6 +80,7 @@ const items = [
     },
     {
         id: 6,
+        number: 23,
         name: "Box",
         price: 99,
         description: "A very nice box, that opens on the short side with piano hinges.Holes for mounting on the inside Was used to store various gameboys and games. Made by violet valchromat, plywood and some brass. A bit heavy, but very sturdy. A few blemishes and have a small wooden piece on the bottom side to ensure that the main door do not sag.",
@@ -86,205 +94,296 @@ const items = [
     },
     {
         id: 7,
+        number: 24,
         name: "???",
         price: "???",
         description: "This item will be revealed when previous items are sold",
-        image: PLACEHOLDER,
+        image: "images/items/item7/main.jpg",
         sold: false,
         hidden: true,
         additionalImages: []
     },
     {
         id: 8,
+        number: 25,
         name: "???",
         price: "???",
         description: "This item will be revealed when previous items are sold",
-        image: PLACEHOLDER,
+        image: "images/items/item8/main.jpg",
         sold: false,
         hidden: true,
         additionalImages: []
     },
     {
         id: 9,
+        number: 26,
         name: "???",
         price: "???",
         description: "This item will be revealed when previous items are sold",
-        image: PLACEHOLDER,
+        image: "images/items/item9/main.jpg",
         sold: false,
         hidden: true,
         additionalImages: []
     }
 ];
 
-// Add this function to find the first unsold item
-function findFirstUnsoldItemIndex() {
-    return items.findIndex(item => !item.sold);
+const imageCache = new Map();
+const paintedCanvases = new Set();
+
+function getCurrentItem() {
+    return items.find((item) => !item.sold) || items[items.length - 1];
 }
 
-// Initialize currentItemIndex to the first unsold item
-let currentItemIndex = 0;  // This will make item1 (index 0) the current item for sale
+function isItemLocked(item) {
+    const current = getCurrentItem();
+    return !item.sold && item.id !== current.id;
+}
 
-function renderItems() {
-    const container = document.querySelector('.grid-container');
-    if (!container) {
-        console.error('Grid container not found');
+function isPlaceholderSrc(src) {
+    return !src || src === PLACEHOLDER || src.startsWith("data:");
+}
+
+function loadImage(src) {
+    if (imageCache.has(src)) {
+        return imageCache.get(src);
+    }
+    const promise = new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+    imageCache.set(src, promise);
+    return promise;
+}
+
+function paintCover(canvas, img, blurred) {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) {
         return;
     }
-    
-    container.innerHTML = '';
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Filter items that have images
-    const itemsWithImages = items.filter(item => {
-        try {
-            // Change from 6 to 9 to include new items
-            return item.id <= 9 && item.image;
-        } catch (e) {
-            console.error('Error checking images for item:', item.id);
-            return false;
+    const pad = blurred ? 48 : 0;
+    const scale = Math.max(
+        (rect.width + pad * 2) / img.naturalWidth,
+        (rect.height + pad * 2) / img.naturalHeight
+    );
+    const dw = img.naturalWidth * scale;
+    const dh = img.naturalHeight * scale;
+
+    if (blurred) {
+        ctx.filter = "blur(24px)";
+    }
+    ctx.drawImage(img, (rect.width - dw) / 2, (rect.height - dh) / 2, dw, dh);
+    ctx.filter = "none";
+
+    if (blurred) {
+        ctx.fillStyle = "rgba(224, 218, 209, 0.28)";
+        ctx.fillRect(0, 0, rect.width, rect.height);
+    }
+}
+
+function mountProtectedImage(container, src, blurred) {
+    container.style.backgroundImage = "";
+    container.replaceChildren();
+
+    if (isPlaceholderSrc(src)) {
+        container.style.backgroundImage = "url('" + PLACEHOLDER + "')";
+        return;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.setAttribute("aria-hidden", "true");
+    container.appendChild(canvas);
+
+    loadImage(src).then((img) => {
+        const paint = () => paintCover(canvas, img, blurred);
+        paint();
+        if (paintedCanvases.has(canvas)) {
+            return;
         }
+        paintedCanvases.add(canvas);
+        const observer = new ResizeObserver(paint);
+        observer.observe(container);
+    }).catch(() => {
+        container.style.backgroundImage = "url('" + PLACEHOLDER + "')";
     });
+}
 
-    // Sort the filtered items
-    const sortedItems = [...itemsWithImages].sort((a, b) => {
-        const aIsCurrent = items.indexOf(a) === 0;  // Check if it's item1
-        const bIsCurrent = items.indexOf(b) === 0;  // Check if it's item1
-        
-        // Handle current item - put it first
-        if (aIsCurrent) return -1;  // Item1 goes to start
-        if (bIsCurrent) return 1;   // Item1 goes to start
-        
-        // Handle sold/unsold items
-        if (a.sold && !b.sold) return 1;   // Sold items at end
-        if (!a.sold && b.sold) return -1;  // Unsold items after current
-        
-        return 0;
-    });
+function formatMoney(value) {
+    if (typeof value !== "number") {
+        return "???";
+    }
+    return value % 1 === 0 ? value.toFixed(0) : value.toFixed(2);
+}
 
-    console.log('Rendering items:', sortedItems.length, 'items found');
-    
-    sortedItems.forEach((item) => {
-        const itemElement = document.createElement('div');
-        const isCurrentItem = item.id === 1;
-        const isHidden = item.hidden && !item.sold;
-        
-        itemElement.className = `item ${isHidden ? 'blurred' : ''} ${!item.sold && !isCurrentItem && !isHidden ? 'blurred' : ''} ${item.sold ? 'sold' : ''}`;
-        
-        if (isCurrentItem || item.sold) {
-            itemElement.style.cursor = 'pointer';
-            itemElement.addEventListener('click', () => openModal(item));
+function saleStickerHTML() {
+    return '<div class="sale-sticker" aria-label="50 percent off">' +
+        '<span class="sale-sticker__off">−50%</span>' +
+        '<span class="sale-sticker__label">Sale</span>' +
+        "</div>";
+}
+
+function priceHTML(item, locked) {
+    if (locked) {
+        return '<p class="price">$???</p>';
+    }
+    if (item.originalPrice && item.originalPrice > item.price) {
+        return '<p class="price">' +
+            '<span class="price-was">$' + formatMoney(item.originalPrice) + "</span>" +
+            '<span class="price-now">$' + formatMoney(item.price) + "</span>" +
+            "</p>";
+    }
+    return '<p class="price">$' + formatMoney(item.price) + "</p>";
+}
+
+function itemStatus(item) {
+    if (item.sold) {
+        return { label: "Sold", tagClass: "fp-tag--done" };
+    }
+    if (isItemLocked(item)) {
+        return { label: "Locked", tagClass: "fp-tag--idea" };
+    }
+    return { label: "For sale", tagClass: "fp-tag--live" };
+}
+
+function renderItems() {
+    const container = document.querySelector(".grid-container");
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    items.forEach((item) => {
+        const locked = isItemLocked(item);
+        const status = itemStatus(item);
+        const itemElement = document.createElement("article");
+        itemElement.className = "item" + (item.sold ? " sold" : "") + (locked ? " locked" : "") + (item.discount ? " item--sale" : "");
+
+        const displayName = locked ? "???" : item.name;
+
+        itemElement.innerHTML =
+            '<div class="img-shield">' +
+                '<div class="img-cover"></div>' +
+                (item.discount && !locked && !item.sold ? saleStickerHTML() : "") +
+            "</div>" +
+            '<div class="item-info">' +
+                '<div class="item-meta">' +
+                    '<span class="fp-tag ' + status.tagClass + '">' + status.label + "</span>" +
+                "</div>" +
+                "<h2>" + displayName + "</h2>" +
+                priceHTML(item, locked) +
+            "</div>";
+
+        const cover = itemElement.querySelector(".img-cover");
+        const preview = isPlaceholderSrc(item.image) ? PLACEHOLDER : item.image;
+        mountProtectedImage(cover, preview, locked);
+
+        if (!locked) {
+            itemElement.addEventListener("click", () => openModal(item));
         }
-
-        const imgSrc = isHidden ? PLACEHOLDER : item.image;
-
-        itemElement.innerHTML = `
-            <div class="item-number">#${item.id}</div>
-            <div class="img-shield">
-                <div class="img-cover" style="background-image:url('${imgSrc}')"></div>
-            </div>
-            <div class="item-info">
-                <h2>${item.name}</h2>
-                <p class="price">$${item.price}</p>
-            </div>
-        `;
 
         container.appendChild(itemElement);
     });
-
-    // Only show PayPal button if current item is not sold
-    const paypalContainer = document.getElementById('paypal-button-container');
-    if (paypalContainer) {
-        paypalContainer.style.display = items[currentItemIndex].sold ? 'none' : 'block';
-    }
 }
 
-// Add error handling for initial render
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, checking modal...');
-    const modal = document.getElementById('modal');
-    if (!modal) {
-        console.error('Modal not found in DOM!');
-    } else {
-        console.log('Modal found in DOM');
-    }
-    console.log('Rendering items...');
-    renderItems();
-});
-
 function openModal(item) {
-    console.log('Opening modal for:', item.name);
-    const modal = document.getElementById('modal');
-    if (!modal) {
-        console.error('Modal element not found!');
+    if (isItemLocked(item)) {
         return;
     }
-    const modalTitle = document.getElementById('modal-title');
-    const modalDescription = document.getElementById('modal-description');
-    const modalPrice = document.getElementById('modal-price');
-    const modalMainImage = document.getElementById('modal-main-image');
-    const modalThumbnails = document.querySelector('.modal-thumbnails');
-    const buyButton = document.getElementById('modal-buy-button');
-    const paypalContainer = document.getElementById('modal-paypal-container');
+
+    const modal = document.getElementById("modal");
+    const modalTitle = document.getElementById("modal-title");
+    const modalDescription = document.getElementById("modal-description");
+    const modalSpec = document.getElementById("modal-spec");
+    const modalMainImage = document.getElementById("modal-main-image");
+    const modalThumbnails = document.querySelector(".modal-thumbnails");
+    const buyButton = document.getElementById("modal-buy-button");
+    const paypalContainer = document.getElementById("modal-paypal-container");
+    const paypalError = document.getElementById("paypal-error");
+    const current = getCurrentItem();
 
     modalTitle.textContent = item.name;
-    
+
     const description = item.description.replace(
-        /(https?:\/\/[^\s]+)/g, 
-        '<a href="$1" target="_blank" style="color: #fff; text-decoration: underline;">$1</a>'
+        /(https?:\/\/[^\s]+)/g,
+        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
     );
     modalDescription.innerHTML = description;
-    
-    modalPrice.textContent = `$${item.price} + $15 Shipping`;
-    modalMainImage.style.backgroundImage = `url('${item.image}')`;
 
-    modalThumbnails.innerHTML = '';
+    const shipping = 15;
+    const total = typeof item.price === "number" ? item.price + shipping : null;
+    const priceCell = item.originalPrice
+        ? '<span class="price-was">$' + formatMoney(item.originalPrice) + '</span> $' + formatMoney(item.price)
+        : "$" + formatMoney(item.price);
+    modalSpec.innerHTML =
+        '<div class="fp-spec__row"><span>Price</span><span>' + priceCell + "</span></div>" +
+        (item.discount ? '<div class="fp-spec__row"><span>Discount</span><span>−' + item.discount + "%</span></div>" : "") +
+        '<div class="fp-spec__row"><span>Shipping</span><span>$' + shipping + " USD</span></div>" +
+        '<div class="fp-spec__row"><span>Total</span><span>$' + (total === null ? "???" : formatMoney(total)) + "</span></div>";
+
+    const modalSticker = document.getElementById("modal-sticker");
+    if (item.discount && !item.sold) {
+        modalSticker.classList.remove("hidden");
+    } else {
+        modalSticker.classList.add("hidden");
+    }
+
+    paypalError.classList.add("hidden");
+    paypalError.textContent = "";
+    mountProtectedImage(modalMainImage, item.image);
+
+    modalThumbnails.innerHTML = "";
     if (item.additionalImages && item.additionalImages.length > 0) {
-        item.additionalImages.forEach(imgSrc => {
-            const thumb = document.createElement('div');
-            thumb.className = 'modal-thumbnail';
-            thumb.style.backgroundImage = `url('${imgSrc}')`;
-            thumb.onclick = () => modalMainImage.style.backgroundImage = `url('${imgSrc}')`;
+        item.additionalImages.forEach((imgSrc) => {
+            const thumb = document.createElement("div");
+            thumb.className = "modal-thumbnail";
+            mountProtectedImage(thumb, imgSrc);
+            thumb.onclick = () => mountProtectedImage(modalMainImage, imgSrc);
             modalThumbnails.appendChild(thumb);
         });
     }
 
-    // Show/hide buy button based on item status
-    if (item.sold) {
-        buyButton.style.display = 'none';
-        paypalContainer.classList.add('hidden');
-    } else if (item.id === 1) {
-        buyButton.style.display = 'block';
-        paypalContainer.classList.add('hidden');
-        
-        // Add click handler for buy button
-        buyButton.onclick = function() {
-            console.log('Buy button clicked');
-            
-            // Check if PayPal is loaded
-            if (!window.paypal) {
-                console.error('PayPal SDK not loaded');
-                alert('PayPal is not loaded properly. Please refresh the page.');
+    paypalContainer.classList.add("hidden");
+    paypalContainer.innerHTML = "";
+
+    if (item.sold || item.id !== current.id || typeof item.price !== "number") {
+        buyButton.style.display = "none";
+    } else {
+        buyButton.style.display = "block";
+        buyButton.onclick = function () {
+            if (!window.paypal || typeof paypal.Buttons !== "function") {
+                paypalError.textContent = "PayPal did not load. Check the network tab and refresh.";
+                paypalError.classList.remove("hidden");
                 return;
             }
 
-            buyButton.style.display = 'none';
-            paypalContainer.classList.remove('hidden');
-            paypalContainer.innerHTML = '';
-            
+            buyButton.style.display = "none";
+            paypalContainer.classList.remove("hidden");
+            paypalContainer.innerHTML = "";
+            paypalError.classList.add("hidden");
+
             try {
-                // Create and render new PayPal buttons
-                const buttons = paypal.Buttons({
+                paypal.Buttons({
                     style: {
-                        layout: 'vertical',
-                        color: 'gold',  // Use standard PayPal button style
-                        shape: 'rect',
-                        label: 'paypal'
+                        layout: "vertical",
+                        color: "black",
+                        shape: "rect",
+                        label: "paypal"
                     },
                     createOrder: (data, actions) => {
                         return actions.order.create({
                             purchase_units: [{
-                                description: item.name,
+                                description: item.discount ? item.name + " (−" + item.discount + "%)" : item.name,
                                 amount: {
-                                    value: (item.price + 15).toString()
+                                    currency_code: "USD",
+                                    value: (item.price + 15).toFixed(2)
                                 }
                             }]
                         });
@@ -292,64 +391,67 @@ function openModal(item) {
                     onApprove: (data, actions) => {
                         return actions.order.capture().then((details) => {
                             item.sold = true;
-                            const nextItem = items.find(i => !i.sold && i.id > 1);
-                            if (nextItem) {
-                                currentItemIndex = items.indexOf(nextItem);
-                            }
                             renderItems();
-                            modal.style.display = 'none';
-                            alert('Transaction completed by ' + details.payer.name.given_name);
+                            modal.style.display = "none";
+                            alert("Transaction completed by " + details.payer.name.given_name);
                         });
+                    },
+                    onError: (error) => {
+                        paypalError.textContent = "PayPal could not start the payment. " + (error && error.message ? error.message : "Try again, or check the PayPal app settings.");
+                        paypalError.classList.remove("hidden");
+                        buyButton.style.display = "block";
+                    },
+                    onCancel: () => {
+                        buyButton.style.display = "block";
                     }
+                }).render("#modal-paypal-container").catch((error) => {
+                    paypalError.textContent = "PayPal buttons failed to render. " + (error && error.message ? error.message : "");
+                    paypalError.classList.remove("hidden");
+                    buyButton.style.display = "block";
+                    paypalContainer.classList.add("hidden");
                 });
-
-                console.log('Rendering PayPal buttons');
-                buttons.render('#modal-paypal-container');
             } catch (error) {
-                console.error('Error setting up PayPal:', error);
-                buyButton.style.display = 'block';
-                paypalContainer.classList.add('hidden');
+                paypalError.textContent = "PayPal setup failed. " + (error && error.message ? error.message : "");
+                paypalError.classList.remove("hidden");
+                buyButton.style.display = "block";
+                paypalContainer.classList.add("hidden");
             }
         };
-    } else {
-        buyButton.style.display = 'none';
-        paypalContainer.classList.add('hidden');
     }
 
-    modal.style.display = 'block';
+    modal.style.display = "block";
 }
 
-// Add modal close functionality
-document.querySelector('.close-button').onclick = function() {
-    document.getElementById('modal').style.display = 'none';
+function closeModal() {
+    document.getElementById("modal").style.display = "none";
 }
 
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('modal');
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
-}
+document.addEventListener("DOMContentLoaded", () => {
+    renderItems();
 
-// Close modal on Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        document.getElementById('modal').style.display = 'none';
-    }
+    document.querySelector(".close-button").onclick = closeModal;
+
+    window.addEventListener("click", (event) => {
+        if (event.target.id === "modal") {
+            closeModal();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeModal();
+        }
+    });
+
+    document.addEventListener("contextmenu", (event) => {
+        if (event.target.closest(".img-shield, .modal-main-shield, .modal-thumbnail, canvas")) {
+            event.preventDefault();
+        }
+    });
+
+    document.addEventListener("dragstart", (event) => {
+        if (event.target.tagName === "IMG" || event.target.closest(".img-shield, .modal-images")) {
+            event.preventDefault();
+        }
+    });
 });
-
-// Prevent right-click context menu on the whole page to protect images
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-});
-
-// Prevent drag on all images and image containers
-document.addEventListener('dragstart', function(e) {
-    if (e.target.tagName === 'IMG' || e.target.classList.contains('img-cover')) {
-        e.preventDefault();
-    }
-});
-
-currentItemIndex = 2;
-renderItems(); 
